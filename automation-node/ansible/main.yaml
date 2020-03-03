@@ -1,0 +1,40 @@
+---
+- hosts: all
+  tasks:
+     - name: Run command
+       command: "hostname"
+       register: cmd
+     - debug:
+          var : cmd
+
+     - name: "install the latest version of {{ package }}"
+       yum:
+         name: "{{ package }}"
+         state: latest
+       register: out
+
+     - debug:
+         var: out
+
+     - name: Run curl
+       command: "curl http://localhost"
+       register: curl
+       ignore_errors: yes
+
+
+     - name: "Start service {{ package }}, if not started"
+       service:
+            name: "{{ package }}"
+            state: started
+       register: start
+
+     - debug:
+         var: out
+
+
+     - name: Run curl
+       command: "curl http://localhost"
+       register: curl
+
+     - debug:
+         var: out
