@@ -9,7 +9,7 @@ resource "google_compute_instance" "automation-node" {
   #name         = "${var.prefix}-vm-${count.index}"
   name         = "automation-vm"
   machine_type = "n1-standard-1"
-  zone         = "${var.region}-b"
+  zone         = "${var.region}-c"
 
   tags = ["automation-node", "webapp"]
 
@@ -35,9 +35,19 @@ resource "google_compute_instance" "automation-node" {
   metadata = {
     name = "automation-node"
   #  user-data = "${file("${path.module}/cloud-init.yaml")}"
-    ssh-keys = "${var.ssh_user}:${file(var.ssh_key)}"
+    ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
   }
-  metadata_startup_script = "echo hi > /test.txt"
+  //metadata_startup_script = "echo hi > /test.txt"
+  # We connect to our instance via Terraform and remotely executes our script using SSH
+  provisioner "remote-exec" {
+    script = var.script_path
+    connection {
+      type        = "ssh"
+      host        = google_compute_instance.automation-node.network_interface.0.access_config.0.nat_ip
+      user        = var.ssh_user
+      private_key = file(var.private_ssh_key)
+    }
+  }
 
   service_account {
     scopes = ["userinfo-email", "compute-ro", "storage-ro"]

@@ -1,9 +1,9 @@
 variable "project"{
-    default = "fresh-mason-269307"
+    default = "organic-acronym-269914"
 }
 
 variable "region" {
-    default="asia-south1"
+    default="asia-east1"
 }
 
 
@@ -16,6 +16,13 @@ variable "ssh_user" {
     default = "automation"
 }
 
-variable "ssh_key" {
+variable "public_ssh_key" {
     default = "C:/Users/prasammi/.ssh/id_rsa.pub"
+}
+
+variable "private_ssh_key" {
+    default = "C:/Users/prasammi/.ssh/id_rsa"
+}
+variable "script_path" {
+    default = "C:/Users/prasammi/classes1/devops_demo1/automation-node/terraform/deploy.sh"
 }
