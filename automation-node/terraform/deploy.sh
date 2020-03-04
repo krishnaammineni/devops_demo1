@@ -97,7 +97,9 @@ cd /devops_demo1/Master-node/terraform
 terraform init
 terraform apply -auto-approve
 public_ip2=${terraform output publicIp1}
+echo ${public_ip2} > /test
+echo ${terraform output publicIp1} > /devops_demo1/automation-node/ansible/hosts
 cd ../..
 cd automation-node/ansible
-sudo echo ${public_ip2} > hosts
+sudo echo ${terraform output publicIp1} > hosts
 sudo ansible-playbook main.yaml -i hosts --user automation -e "package=nginx" -become
