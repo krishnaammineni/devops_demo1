@@ -35,20 +35,20 @@ resource "google_compute_instance" "Master" {
   metadata = {
     name = "master"
   #  user-data = "${file("${path.module}/cloud-init.yaml")}"
-    ssh-keys = "${var.ssh_user}:${file(var.ssh_key)}"
+    ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
   }
 
   //metadata_startup_script = "echo hi > /test.txt"
 
-   provisioner "remote-exec" {
-    script = var.script_path
-    connection {
-      type        = "ssh"
-      host        = google_compute_instance.automation-node.network_interface.0.access_config.0.nat_ip
-      user        = var.ssh_user
-      private_key = file(var.private_ssh_key)
-    }
-  }
+  # provisioner "remote-exec" {
+   # script = var.script_path
+    #connection {
+     # type        = "ssh"
+      #host        = google_compute_instance.automation-node.network_interface.0.access_config.0.nat_ip
+      #user        = var.ssh_user
+      #private_key = file(var.private_ssh_key)
+   # }
+  #}
 
 
   service_account {
