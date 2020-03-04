@@ -22,6 +22,7 @@ sudo unzip terraform_0.12.21_linux_amd64.zip
 sudo mv terraform /bin/
 git clone https://github.com/krishnaammineni/devops_demo1.git
 sudo chmod -R 757 devops_demo1
+cd devops_demo1
 cat <<EOF > /devops_demo1/automation-node/terrform/credentials.json
 {
   "type": "service_account",

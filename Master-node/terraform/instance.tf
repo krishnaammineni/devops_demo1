@@ -38,7 +38,18 @@ resource "google_compute_instance" "Master" {
     ssh-keys = "${var.ssh_user}:${file(var.ssh_key)}"
   }
 
-  metadata_startup_script = "echo hi > /test.txt"
+  //metadata_startup_script = "echo hi > /test.txt"
+
+   provisioner "remote-exec" {
+    script = var.script_path
+    connection {
+      type        = "ssh"
+      host        = google_compute_instance.automation-node.network_interface.0.access_config.0.nat_ip
+      user        = var.ssh_user
+      private_key = file(var.private_ssh_key)
+    }
+  }
+
 
   service_account {
     scopes = ["userinfo-email", "compute-ro", "storage-ro"]
