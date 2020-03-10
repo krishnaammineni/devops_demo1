@@ -37,7 +37,7 @@ resource "google_compute_instance" "automation-node" {
   #  user-data = "${file("${path.module}/cloud-init.yaml")}"
     ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
   }
-   metadata_startup_script = "${file(var.script_path)}"
+   metadata_startup_script = file("deploy.sh")
   # We connect to our instance via Terraform and remotely executes our script using SSH
   #provisioner "remote-exec" {
    # script = var.script_path
