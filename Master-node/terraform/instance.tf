@@ -9,7 +9,7 @@ resource "google_compute_instance" "master" {
   #name         = "${var.prefix}-vm-${count.index}"
   #name         = "test1"
   #count2 = length(var.machine)
-  machine_type = "${n1-standard-2}"
+  machine_type = "n1-standard-2"
   zone         = "${var.region}-a"
 
   tags = ["nginx", "webapp"]
