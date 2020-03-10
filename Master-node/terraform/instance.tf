@@ -3,12 +3,13 @@
 #  zone = "us-central1-a"
 #}
 
-
-resource "google_compute_instance" "Master" {
-  #count = "2"
+resource "google_compute_instance" "master" {
+  count = length(var.user_names)
+  name = var.user_names[count.index]
   #name         = "${var.prefix}-vm-${count.index}"
-  name         = "test1"
-  machine_type = "n1-standard-1"
+  #name         = "test1"
+  #count2 = length(var.machine)
+  machine_type = "${n1-standard-2}"
   zone         = "${var.region}-a"
 
   tags = ["nginx", "webapp"]
