@@ -1,3 +1,5 @@
 credentials.json
 .terraform
 deploy.sh
+terraform.tfstate
+terraform.tfstate.backup
