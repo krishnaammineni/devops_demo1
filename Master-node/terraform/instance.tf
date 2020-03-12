@@ -93,7 +93,7 @@ count = length(var.worker_name)
     ssh-keys = "${var.ssh_user}:${var.public_ssh_key}"
   }
 
-  metadata_startup_script = "${file("deploy.sh")}"
+  #metadata_startup_script = "${file("deploy.sh")}"
 
   /*provisioner "remote-exec" {
     script = var.script_path
