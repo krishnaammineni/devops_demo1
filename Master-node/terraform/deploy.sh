@@ -1,23 +1,14 @@
+# !bin/bash
 
-#!/bin/bash
-
-ANSIBLE_DIR="ansible"
-GIT_DIR="devops_demo/Master-node"
-#public_Ip=${terraform output publicIp}
-public_ip2=${terraform output publicIp1}
-
-sudo yum repolist
-sudo yum install wget unzip git python36 -y
-sudo python3 -m pip install ansible==2.8.0
-sudo wget https://releases.hashicorp.com/terraform/0.12.21/terraform_0.12.21_linux_amd64.zip
-sudo unzip terraform_0.12.21_linux_amd64.zip
-sudo mv terraform /bin/
-sudo git clone https://github.com/krishnaammineni/devops_demo.git
-sudo chmod -R 757 ${GIT_DIR}
-cd ${GIT_DIR}
-sudo mkdir ansible
-cd ${ANSIBLE_DIR}
-#sudo chmod 600 ~/.ssh/id_rsa
-sudo echo ${public_ip2} > hosts
-sudo ansible-playbook main.yaml -i hosts --user automation -e "package=nginx" -become
-
+cd /devops_demo1/Master-Node/terraform
+sudo terraform init
+sudo terraform apply -auto-approve -lock=false
+sudo touch /tmp/hosts /devops_demo1/Master-Node/ansible/hosts /devops_demo1/Master-Node/ansible/output
+sudo chmod 777 /tmp/hosts /devops_demo1/Master-Node/ansible/hosts /devops_demo1/Master-Node/ansible/output
+sudo terraform output -json | jq -r '.[keys[0]].value[]','.[keys[1]].value[]' > /tmp/hosts
+sudo awk 'NR==1{print "[Master]"}1 && NR==2{print " "}1 && NR==2{print "[Workers]"}1' /tmp/hosts > /devops_demo1/Master-Node/ansible/hosts
+sleep 30
+export ANSIBLE_HOST_KEY_CHECKING=False
+cd /devops_demo1/Master-Node/ansible/
+ansible-playbook main.yaml -i hosts
+ansible-playbook k8.yaml -i hosts --limit 'Master'

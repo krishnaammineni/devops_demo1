@@ -12,7 +12,7 @@ resource "google_compute_instance" "master" {
   machine_type = "n1-standard-2"
   zone         = "${var.region}-a"
 
-  tags = ["nginx", "webapp"]
+  tags = ["k8s", "master"]
 
   boot_disk {
     initialize_params {
@@ -66,7 +66,7 @@ count = length(var.worker_name)
   machine_type = "n1-standard-1"
   zone         = "${var.region}-a"
 
-  tags = ["nginx", "webapp"]
+  tags = ["k8s", "worker"]
 
   boot_disk {
     initialize_params {
@@ -88,22 +88,22 @@ count = length(var.worker_name)
   }
 
   metadata = {
-    name = "master"
+    name = "worker"
   #  user-data = "${file("${path.module}/cloud-init.yaml")}"
     ssh-keys = "${var.ssh_user}:${var.public_ssh_key}"
   }
 
-  #metadata_startup_script = "echo hi > /test.txt"
+  metadata_startup_script = "${file("deploy.sh")}"
 
-  # provisioner "remote-exec" {
-   # script = var.script_path
-    #connection {
-     # type        = "ssh"
-      #host        = google_compute_instance.automation-node.network_interface.0.access_config.0.nat_ip
-      #user        = var.ssh_user
-      #private_key = file(var.private_ssh_key)
-   # }
-  #}
+  /*provisioner "remote-exec" {
+    script = var.script_path
+    connection {
+      type        = "ssh"
+      host        = google_compute_instance.automation-node.network_interface.0.access_config.0.nat_ip
+      user        = var.ssh_user
+      private_key = file(var.private_ssh_key)
+    }
+  } */
 
 
   service_account {
