@@ -37,7 +37,8 @@ resource "google_compute_instance" "master" {
     name = "master"
   #  user-data = "${file("${path.module}/cloud-init.yaml")}"
     #ssh-keys = "${var.ssh_user}:${var.public_ssh_key}"
-    ssh-keys = "${var.ssh_user}:${file("public_ssh_key")}"
+    #ssh-keys = "${var.ssh_user}:${file("public_ssh_key")}"
+    ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
   }
 
   #metadata_startup_script = "echo hi > /test.txt"
@@ -92,7 +93,7 @@ count = length(var.worker_name)
     name = "worker"
   #  user-data = "${file("${path.module}/cloud-init.yaml")}"
     #ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
-    ssh-keys = "${var.ssh_user}:"${file("public_ssh_key")}"
+    ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
   }
 
   service_account {
