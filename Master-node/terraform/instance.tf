@@ -38,6 +38,7 @@ resource "google_compute_instance" "master" {
   #  user-data = "${file("${path.module}/cloud-init.yaml")}"
     #ssh-keys = "${var.ssh_user}:${var.public_ssh_key}"
     #ssh-keys = "${var.ssh_user}:${file("public_ssh_key")}"
+    #ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
     ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
   }
 
@@ -93,9 +94,10 @@ count = length(var.worker_name)
     name = "worker"
   #  user-data = "${file("${path.module}/cloud-init.yaml")}"
     #ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
+    #ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
     ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
   }
-
+  //metadata_startup_script = "${file("deploy.sh")}"
   service_account {
     scopes = ["userinfo-email", "compute-ro", "storage-ro"]
   }
