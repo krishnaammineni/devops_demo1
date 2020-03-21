@@ -16,9 +16,9 @@ variable "ssh_user" {
     default = "automation"
 }
 
-#variable "public_ssh_key" {
-#    default = "/home/automation/.ssh/authorized_keys"
-#}
+variable "public_ssh_key" {
+    default = "/home/automation/.ssh/id_rsa.pub"
+}
 
 #variable "public_ssh_key" {
 #    default = "C:/Users/prasammi/.ssh/id_rsa.pub"

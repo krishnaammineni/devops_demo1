@@ -39,8 +39,8 @@ resource "google_compute_instance" "master" {
     #ssh-keys = "${var.ssh_user}:${var.public_ssh_key}"
     #ssh-keys = "${var.ssh_user}:${file("public_ssh_key")}"
     #ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
-    #ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
-    ssh-keys = "${var.ssh_user}:${file("public_ssh_key")}" 
+    ssh-keys = "${var.ssh_user}:${file(var.public_ssh_key)}"
+    #ssh-keys = "${var.ssh_user}:${file("public_ssh_key")}" 
   }
 
   #metadata_startup_script = "echo hi > /test.txt"
