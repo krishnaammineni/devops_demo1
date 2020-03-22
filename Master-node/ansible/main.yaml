@@ -82,7 +82,8 @@
   
   
       - name: kubeadmin init
-        shell: sudo kubeadm init --pod-network-cidr=10.240.0.0/16 --ignore-preflight-errors=all
+        become: yes
+        shell: kubeadm init --pod-network-cidr=10.240.0.0/16 --ignore-preflight-errors=all
         register: k8_output
         when: "'Master' in group_names"
   
@@ -90,16 +91,19 @@
           join: "{{ k8_output.stdout_lines[-1] }}"
         when: "'Master' in group_names"
   
-      - name: create .kube
+      - name: create .kube        
         command: mkdir -p $HOME/.kube
+        become: yes
         when: "'Master' in group_names"
   
       - name: copy config 
-        shell: sudo cp -i /etc/kubernetes/admin.conf /home/kiran/.kube/config
+        shell: cp -i /etc/kubernetes/admin.conf /home/automation/.kube/config
+        become: yes
         when: "'Master' in group_names"
   
-      - name: Chnage ownership
-        shell: sudo chown $(id -u):$(id -g) /home/kiran/.kube/config
+      - name: Change ownership        
+        shell: chown $(id -u):$(id -g) /home/automation/.kube/config
+        become: yes
         when: "'Master' in group_names"  
   
       - name: setup flannel
@@ -110,9 +114,8 @@
         shell: kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
         when: "'Master' in group_names"
   
-      - name: create .kube
+      - name: create .kube        
         shell: kubectl --kubeconfig /etc/kubernetes/admin.conf create -f /root/dashboard.yaml
-        become: yes
         when: "'Master' in group_names"
   
       - name: add worker to cluster
