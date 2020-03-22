@@ -1,35 +1,69 @@
 ---
-    - hosts: Master
-      vars:
-        apim_component_name: ps
-      become: 'yes'
-      tasks:
-        - name: Install k8s
-          command: "sudo kubeadm init --pod-network-cidr=10.240.0.0/16 --ignore-preflight-errors=all"
-          become: yes
-          register: k8_output
-        - debug:
-            var: k8_output.stdout_lines[-2],k8_output.stdout_lines[-1] 
-            
-        #- local_action: lineinfile line={{ k8_output.stdout_lines[-2],k8_output.stdout_lines[-1] }} path=/devops_demo1/Master-Node/ansible/output
----
-    - hosts: Master
-      become: yes
-      gather_facts: false
-      tasks:
-          - name: get join command
-            shell: kubeadm token create --print-join-command
-            register: join_command_raw
-
-          - name: set join command
-            set_fact:
-              join_command: "{{ join_command_raw.stdout_lines[0] }}"
----
-    - hosts: Workers
-      become: yes
-      tasks:
-         - name: join cluster
-           shell: "{{ hostvars['Master'].join_command }} >> node_joined.txt"
-           args:
-             chdir: $HOME
-             creates: node_joined.txt
+  - hosts: all
+    vars:
+      apim_component_name: ps
+    become: 'yes'
+    tasks:
+      - name: Install k8s
+        command: "sudo kubeadm init --pod-network-cidr=10.240.0.0/16 --ignore-preflight-errors=all"
+        become: yes
+        register: k8_output
+        when: "'Master' in group_names"
+  
+      - debug:
+          var: k8_output
+        when: "'Master' in group_names"
+  
+      - name: create dir
+        file:
+          path: ~/.kube
+          state: directory
+        when: "'Master' in group_names"
+  
+      - name: copy kube conf
+        copy:
+          src: /etc/kubernetes/admin.conf
+          dest: ~/.kube/config
+          remote_src: yes
+        when: "'Master' in group_names"
+  
+      - name: change owner
+        file:
+          path: ~/.kube/config
+          owner: root
+          group: root
+        when: "'Master' in group_names"
+  
+      - name: get cert Hash
+        shell: "openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'"
+        register: cert_hash
+        when: "'Master' in group_names"
+  
+      - debug:
+          var: cert_hash.stdout
+        when: "'Master' in group_names"
+  
+      - name: gen token
+        command: "kubeadm token create"
+        register: token
+        when: "'Master' in group_names"
+  
+      - debug:
+          msg: "kubeadm join --token {{ hostvars[groups.Master[0]].token.stdout }} {{ hostvars[groups.Master[0]].ansible_facts.default_ipv4.address }}:6443 --discovery-token-ca-cert-hash sha256:{{ hostvars[groups.Master[0]].cert_hash.stdout }} --ignore-preflight-errors=all"
+  
+      - name: Join Nodes to Cluster
+        command: "kubeadm join --token {{ hostvars[groups.Master[0]].token.stdout }} {{ hostvars[groups.Master[0]].ansible_facts.default_ipv4.address }}:6443 --discovery-token-ca-cert-hash sha256:{{ hostvars[groups.Master[0]].cert_hash.stdout }} --ignore-preflight-errors=all"
+        when: "'Workers' in group_names"
+        register: worker_out
+  
+      - debug:
+          var: worker_out
+  
+      - name: get nodes
+        command: "kubectl get nodes"
+        register: nodes
+        when: "'Master' in group_names"
+  
+      - debug:
+          var: nodes.stdout_lines
+        when: "'Master' in group_names"
