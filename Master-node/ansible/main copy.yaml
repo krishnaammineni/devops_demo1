@@ -86,6 +86,9 @@
         become: yes
         register: k8_output
         when: "'Master' in group_names"
+      - debug:
+          var: k8_output
+
 
       - set_fact:
           join: "{{ k8_output.stdout_lines[-1] }}"
